@@ -4,9 +4,9 @@
 시연 영상 : <a href="https://www.youtube.com/watch?v=hXkQHUCjkWM&ab_channel=%EB%A1%9C%EC%8A%88" target="blank" rel="noreferrer noopener">YouTube 바로가기</a><br>
 프로젝트 일정 : 2022.07.07 ~ 2022.08.16<br><br>
 
-프론트엔드 팀깃헙 링크 : https://github.com/MeoSeon12/egodaeyeo-frontend<br>
-백엔드 팀깃헙 링크 : https://github.com/MeoSeon12/egodaeyeo-backend<br>
-S.A 링크 : https://quixotic-wok-871.notion.site/S-A-3183ff7202e942099238af3effd956ea
+프론트엔드 팀 Repository : https://github.com/MeoSeon12/egodaeyeo-frontend<br>
+백엔드 팀 Repository : https://github.com/MeoSeon12/egodaeyeo-backend<br>
+S.A 링크 : <a href="https://quixotic-wok-871.notion.site/S-A-3183ff7202e942099238af3effd956ea" target="blank" rel="noreferrer noopener">Notion 바로가기</a>
 
 <br>
 
@@ -204,7 +204,44 @@ S.A 링크 : https://quixotic-wok-871.notion.site/S-A-3183ff7202e942099238af3eff
     > [📍 nginx.conf](https://github.com/Roshu2/egodaeyeo-backend/blob/6edb5e8b0f9ac20d24403f0a949c1d19b012e7ad/nginx/nginx.conf#L1)
   - AWS RDS로 PostgreSQL 데이터베이스를 생성하여 사용
   - AWS S3로 이미지 업로드 설정 (권한 설정)
-  
+
+<br>
+담당했던 모든 기능을 풀스택으로 작업하였습니다<br>
+
+<br>
+
+## 4-2. 트러블 슈팅(김규민)
+### 채팅방 개별 연결 문제  
+> 처음에 채팅 기능을 구현 했을때 다른 채팅방에 접속을해도 채팅이 보내지는 현상이 발생했습니다.<br>
+> 원인은 기존의 연결이 끊어지지 않고 유지되어서 채팅방을 옮겼다고 생각했지만 WebSocket은 같은 것을 사용하고 있었습니다.<br>
+
+→ 각 채팅방을 클릭했을때 WebSocket의 연결을 JS의 WebSocket.close() 메소드를 활용하여 닫아주고 새롭게 연결되게 하여 이 문제를 해결 하였습니다.<br>
+[📍 채팅방 Open JS](https://github.com/Roshu2/egodaeyeo-frontend/blob/cd0e781880b103d9beb2f282cda156026a67ebd0/index/js/chat.js#L985)
+
+### Pagination next URL http / https 문제
+> https 프로토콜 송신이 가능하게 설정한 후에 pagination에서 보내주는 next url도 http에서 https로 바꿔야 하는 문제가 발생했습니다.<br>
+
+→ StackOverFlow를 활용해서 해결법을 찾아서 아래의 코드를 settings.py에 추가해주고
+```python  
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+```  
+→ nginx.conf 에 아래의 내용을 기본 location부분에 추가를 하여 pagination의 next url도 https로 보내지게 해결하였습니다.<br>
+```
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+```
+<br>
+
+
+### 대여 종료후 같은 물품 재대여 불가능 문제
+> 대여를 하다보면 같은 제품이 마음에 들어서 또 대여를 하고싶은 경우가 생길 수 있습니다.<br>
+> 그래서 재대여를 하려고 할 시, 기존의 로직이 contract가 이미 존재할 경우 새롭게 생성되지 않도록 막아놨었습니다.<br>
+> 그리고 채팅방도 기존의 채팅방이 열리게 되는 현상도 중복으로 겹쳤었습니다.<br>
+
+→ 채팅방에 연결된 contract의 status를 체크해서 대여 종료일시에는 새롭게 채팅방을 생성<br>
+→ contract의 status를 체크해서 대여 종료일시에는 새롭게 contract를 생성하게 하여 문제를 해결하였습니다.<br>
+[📍 Contract 생성 View](https://github.com/Roshu2/egodaeyeo-backend/blob/dca4d98abd871ab7591b2f41b88bcefa49eb554a/contract/views.py#L26)  
+[📍 채팅방 생성 View](https://github.com/Roshu2/egodaeyeo-backend/blob/dca4d98abd871ab7591b2f41b88bcefa49eb554a/chat/views.py#L31)
+
 <br>
 
 ## 5. API 명세서
